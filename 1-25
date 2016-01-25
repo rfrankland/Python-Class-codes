@@ -1,0 +1,57 @@
+from random import randrange 
+
+class State(object):
+    def __init__(self, ix):
+        self.index = ix
+        self.link = None # placeholder, not None if Snake of Ladder
+        
+    def process(self):
+        """Action when landed upon"""
+        if self.link:
+            if self.link > self.index:
+                # Ladder!
+                return self.link
+            else:
+                # Snake!
+                return self.link
+        else:
+            # link is None: "normal" = not a Snake or Ladder
+            return self.index
+        
+class GameFSM(object):
+    def __init__(self, n):
+        self.all_states = []
+        moves = []
+        rolls = []
+        for ix in range (n+1):
+            self.all_states.append(State(ix))
+        self.position = 0
+
+    def move(self, die):
+    """die is an integer"""
+    		inter_pos = self.position + die
+        state_obj = self.all_states[inter_pos]
+        final_pos = state_obj.process()
+        self.position = final_pos
+        moves.append(self.position)
+        rolls.append(die)
+        return moves, rolls
+        
+    def run(self):
+    		print("Starting Game!")
+    		while self.position < self.n:
+        	# roll die
+          die = roll()
+          # move based on die roll
+          self.move(die)
+          # record results
+        print("Game Over!")
+        
+
+game = GameFSM(16)
+
+game.all_states[2].link = 10
+game.all_states[8].link = 14 
+
+game.all_states[11].link = 4
+game.all_states[15].link = 6
