@@ -1,0 +1,101 @@
+# coding: utf-8
+
+# ## Finite State Machine for Snakes and Ladders game
+
+import random
+
+class State(object):
+    def __init__(self, ix):
+        self.index = ix
+        self.link = None  # placeholder, not None if Snake or Ladder
+        self.kind = '' #placeholder
+
+    def process(self):
+        """Action when landed upon"""
+        if self.link:
+            if self.link > self.index:
+                self.kind = 'L' # gets reupdated every time this method is called
+                print("Ladder! Move from {0} to {1}".format(self.index, self.link))
+                return self.link
+            else:
+                self.kind = 'S'
+                print("Snake! Slide from {0} to {1}".format(self.index, self.link))
+                return self.link
+        else:
+            self.kind = 'B'
+            # link is None: "Blank" = not a snake or ladder
+            return self.index
+
+
+class GameFSM(object):
+    def __init__(self, n):
+        #list of State object for each position on the board
+        self.all_states = []
+        self.position = 0
+        #current position of player on board
+        self.n = n
+        #make empty board states for each position
+        #Snake and Ladder positions must be added later
+        for ix in range(n+1):
+            self.all_states.append(State(ix))
+        # record of moves, die rolls, and snake/ladder use
+        self.records = []
+
+    def move(self, die):
+        """die is an integer
+        """
+        start_pos = self.position
+        inter_pos = self.position + die
+        try:
+            state_obj = self.all_states[inter_pos]
+        except IndexError:
+            kind = 'B' # moved off end of board
+            final_pos = self.n
+        else:
+            kind = state.obj.kind
+            final_pos = state_obj.process()
+        self.position = final_pos
+        # all this could be written more consisely as
+        #self.position = self.all_states[self.position+die].process()
+        record = {'start': start_pos,
+                  'die': die,
+                  'kind': kind,
+                  'end': self.position}
+        self.records.append(record)
+
+    def run(self):
+        print("Starting game!")
+        while self.position < self.n:
+            # roll die
+            die = rollDie()
+            print("You rolled a {}".format(die))
+            # move based on die roll
+            self.move(die)
+            self.records.append(record)
+            # record results
+            print("New position is {}".format(self.position))
+        print("Game over!")
+
+
+# Global constant in caps
+DIE_SIDES = 4
+
+def rollDie():
+    return random.randint(1, DIE_SIDES)
+
+game = GameFSM(16)
+
+
+# Ladders
+game.all_states[2].link = 10
+game.all_states[8].link = 14
+
+
+# Snakes
+game.all_states[11].link = 4
+game.all_states[15].links = 6
+
+print(game.all_states)
+
+game.run()
+
